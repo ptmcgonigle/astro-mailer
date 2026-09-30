@@ -1,0 +1,22 @@
+---
+/**
+ * Footer Component
+ * A premium, minimalist footer styled entirely with standard Tailwind CSS v4.
+ */
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="py-12 px-8 bg-slate-950 text-slate-400 text-center font-sans border-t border-white/5">
+    <div class="max-w-5xl mx-auto">
+        <p class="text-sm tracking-wide">
+            &copy; {currentYear} Created by
+            <a
+                href="https://thewebsiteguy.uk"
+                target="_blank"
+                class="inline-block font-semibold bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent transition-opacity duration-300 hover:opacity-80"
+            >
+                The Website Guy
+            </a>
+        </p>
+    </div>
+</footer>
