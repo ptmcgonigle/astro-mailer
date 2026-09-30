@@ -61,11 +61,11 @@ SMTP_SECURE=tls
 SMTP_PORT=587
 
 MAIL_FROM_ADDRESS=your-email@example.com
-MAIL_FROM_NAME="Website Contact"
+MAIL_FROM_NAME=Website Contact
 MAIL_TO_ADDRESS=admin@your-domain.com
-MAIL_TO_NAME="Admin"
+MAIL_TO_NAME=Admin
 MAIL_BCC_ADDRESS=archive@your-domain.com # Optional: Single or comma-separated addresses
-MAIL_BCC_NAME="Archive"                 # Optional
+MAIL_BCC_NAME=Archive                   # Optional
 
 # ReCAPTCHA Configuration
 RECAPTCHA_SITE_KEY=your-recaptcha-site-key

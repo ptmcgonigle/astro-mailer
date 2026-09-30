@@ -19,11 +19,24 @@ function loadEnv($path) {
     if (!file_exists($path)) return false;
     $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        $trimmed = trim($line);
-        if ($trimmed === '' || strpos($trimmed, '#') === 0) continue;
+        $line = trim($line);
+        if ($line === '' || strpos($line, '#') === 0) continue;
         if (strpos($line, '=') === false) continue;
         list($name, $value) = explode('=', $line, 2);
-        $_ENV[trim($name)] = trim(trim($value), "\"'");
+        $name = trim($name);
+        $value = trim($value);
+
+        // Strip surrounding quotes and inline comments
+        if (preg_match('/^(["\'])(.*?)\1(?:\s*#.*)?$/', $value, $matches)) {
+            $value = $matches[2];
+        } else {
+            $value = preg_replace('/\s*#.*$/', '', $value);
+            $value = trim($value, " \t\n\r\0\x0B\"'");
+        }
+
+        $_ENV[$name] = $value;
+        $_SERVER[$name] = $value;
+        putenv("{$name}={$value}");
     }
     return true;
 }
@@ -107,13 +120,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->Port       = (int)($_ENV['SMTP_PORT'] ?? 587);
 
         // --- Recipients ---
-        $mail->setFrom($_ENV['MAIL_FROM_ADDRESS'] ?? 'no-reply@example.com', $_ENV['MAIL_FROM_NAME'] ?? 'Contact Form');
-        $mail->addAddress($_ENV['MAIL_TO_ADDRESS'] ?? 'admin@example.com', $_ENV['MAIL_TO_NAME'] ?? 'Admin');
+        $from_name = trim($_ENV['MAIL_FROM_NAME'] ?? 'Contact Form', " \t\n\r\0\x0B\"'");
+        $to_name   = trim($_ENV['MAIL_TO_NAME'] ?? 'Admin', " \t\n\r\0\x0B\"'");
+
+        $mail->setFrom($_ENV['MAIL_FROM_ADDRESS'] ?? 'no-reply@example.com', $from_name);
+        $mail->addAddress($_ENV['MAIL_TO_ADDRESS'] ?? 'admin@example.com', $to_name);
         $mail->addReplyTo($email, $name);
 
         // Optional BCC recipient(s) - supports single or comma-separated email addresses
         if (!empty($_ENV['MAIL_BCC_ADDRESS'])) {
-            $bcc_name = $_ENV['MAIL_BCC_NAME'] ?? '';
+            $bcc_name = trim($_ENV['MAIL_BCC_NAME'] ?? '', " \t\n\r\0\x0B\"'");
             $bcc_addresses = array_map('trim', explode(',', $_ENV['MAIL_BCC_ADDRESS']));
             foreach ($bcc_addresses as $bcc) {
                 if (filter_var($bcc, FILTER_VALIDATE_EMAIL)) {
